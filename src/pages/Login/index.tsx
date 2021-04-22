@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+
 import { Button, Box, Paper, TextField, Typography } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 
@@ -9,22 +11,41 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [alertActive, setAlertActive] = useState(false);
+  const [login, setLogin] = useState(false);
 
   const { paper, image, alert } = useStyles();
+  const history = useHistory();
 
-  const handleSubmit = useCallback((event) => {
-    event.preventDefault();
+  const handleSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
 
-    setAlertActive(true);
-  }, []);
+      if (email === "guilhermeddc@gmail.com" && password === "123") {
+        setLogin(true);
+      } else {
+        setLogin(false);
+      }
+
+      setAlertActive(true);
+    },
+    [email, password]
+  );
 
   useEffect(() => {
     if (alertActive) {
       setTimeout(() => {
         setAlertActive(false);
-      }, 5000);
+      }, 3000);
     }
   }, [alertActive]);
+
+  useEffect(() => {
+    if (login) {
+      setTimeout(() => {
+        history.push("/home");
+      }, 1500);
+    }
+  }, [login, history]);
 
   return (
     <Box
@@ -41,10 +62,13 @@ const Login: React.FC = () => {
         elevation={3}
       >
         <img src={Logo} alt="logo" className={image} />
+
         <br />
+
         <Typography variant="h5" align="center" color="primary">
           Bem Vindo!
         </Typography>
+
         <br />
 
         <TextField
@@ -55,7 +79,9 @@ const Login: React.FC = () => {
           onChange={({ target }) => setEmail(target.value)}
           required
         />
+
         <br />
+
         <TextField
           label="Senha"
           type="password"
@@ -64,23 +90,34 @@ const Login: React.FC = () => {
           onChange={({ target }) => setPassword(target.value)}
           required
         />
+
         <br />
+
         <Button type="submit" variant="contained" color="primary">
           Enviar
         </Button>
       </Paper>
-      {alertActive && (
-        <Alert
-          variant="filled"
-          severity="info"
-          className={alert}
-          onClose={() => setAlertActive(false)}
-        >
-          E-mail: {email}
-          <br />
-          Senha: {password}
-        </Alert>
-      )}
+
+      {alertActive &&
+        (login ? (
+          <Alert
+            variant="filled"
+            severity="info"
+            className={alert}
+            onClose={() => setAlertActive(false)}
+          >
+            Conectado com sucesso.
+          </Alert>
+        ) : (
+          <Alert
+            variant="filled"
+            severity="error"
+            className={alert}
+            onClose={() => setAlertActive(false)}
+          >
+            E-mail ou senha incorreto.
+          </Alert>
+        ))}
     </Box>
   );
 };
